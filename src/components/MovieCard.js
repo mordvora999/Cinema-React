@@ -1,91 +1,69 @@
 import React from 'react';
 import Popup from './Popup';
-import  { useReducer ,useState} from 'react';
-import {reducer,initialState} from '../Reducers';
 import DeletePopup from './DeletePopup';
+import {  useState} from 'react';
+//import { reducer, initialState } from '../Reducers';
 import { connect } from 'react-redux';
 
-//class MovieCard extends React.Component
-const MovieCard = (props) =>  {
+const MovieCard = props => {
 
-    const [state, dispatch] = useReducer(reducer, initialState);
+    //const [ state, dispatch ] = useReducer(reducer, initialState);
+    //const [ editMovie, setEditMovie ] = useState(false);
+    const [ showEditPopup, setShowEditPopup ] = useState(false);
+    const [ showDeletePopup, setShowDeletePopup ] = useState(false);
 
-    const [showPopup, setShowPopup] = useState(false);
-    const [delPopup, setDletePopup] = useState(false);
+     function togglePopup(){
+         console.log("togglePopup");
+         showEditPopup ? setShowEditPopup(false) : setShowEditPopup(true);
+         //setEditMovie(true);
+         props.selectedMovieId(props.movie);
+     }
 
-    // constructor(props){
-    //     super(props)
-    //     this.state = { showPopup: false }
-    // }
+     function deleteMovie(){
+        console.log("deleteMovie");
+        showDeletePopup ? setShowDeletePopup(false) : setShowDeletePopup(true);
+        props.deletedMovie(props.movie);
+    }
 
+    const popupEdit = showEditPopup ? <Popup /> : null;
+    const popupDelete = showDeletePopup ? <DeletePopup /> : null;
 
-        // this.setState({
-        //   showPopup: !this.state.showPopup
-        // });
-       
-
-
-
-    // render(){
-        // const popup = this.state.showPopup 
-     
-
-           function  togglePopup ()  {
-                showPopup ? setShowPopup(false) : setShowPopup(true);
-                dispatch ({
-                    type: "MOVIE_SELECTED",
-                   payload:props.movie
-                });
-             
-            }
-
-            function deleteMovie(){ 
-                delPopup ? setDletePopup(false):setDletePopup(true);
-                console.log("delete me----111111", props)
-                dispatch ({
-                    type: "MOVIE_SELECTED",
-                   payload:props
-                });
-               
-                console.log("delete  ", delPopup)
-            }
-
-            const popupEdit= showPopup ? <Popup  /> : null;
-            const popupDelete= delPopup ?<DeletePopup/>:null;
-            const {selectedMovie}=state;
-        console.log('props',props)
-            return (
+    return (
         <div> 
-            <div className="ui card">
-                <div className="content">
-                    <div className="header title">{props.movie.Title}</div>
-                    { <img className="cover" src={props.movie.Poster} onClick={deleteMovie.bind(this)}
+            <div style={{float: 'left', margin: '20px'}} className="ui card">
+                <div className="content images">
+                    { console.log("Component MovieCard") } 
+                     <div className="header title">{props.movie.Title}</div>
+                    { <img className="cover" src={props.movie.Poster}
                         alt={`The Movie Title: ${props.movie.Title}`}/>
-                    }
-                    {popupEdit}
-                    {popupDelete}
+                    } 
                     { <div>
                             <div className="ui two buttons">
-                               <button   onClick={togglePopup.bind(this)} className="ui positive basic labeled icon button">Edit<i className="pencil alternate icon"></i></button>
-                                <button onClick={deleteMovie.bind(this)} className="ui negative basic right labeled icon button">Delete<i className="trash icon"></i></button>
+                               <button onClick={ togglePopup.bind(this) } 
+                                  className="ui positive basic labeled icon button">Edit<i className="pencil alternate icon"></i></button>
+                                <button onClick={ deleteMovie.bind(this) }
+                                 className="ui negative basic right labeled icon button">Delete<i className="trash icon"></i></button>
                             </div>
                       </div>
                     }
                 </div>
             </div>
             <div style={{border:'2px',width:'400px'}}>{popupEdit}</div>
+            <div style={{border:'2px',width:'400px'}}>{popupDelete}</div>
         </div>
-        );
+    );
+} 
+
+const mapDispatchToProps = dispatch => {
+    return {
+        selectedMovieId: (movie) => dispatch({
+            type:'MOVIE_SELECTED',
+            payload: movie }),
+        deletedMovie: (movie) => dispatch ({
+            type: 'MOVIE_DELETED',
+            payload: movie
+        })
     }
+}
 
-    //  const mapStateToProps = state => {
-    //      return {
-    //          movie: state.selectedMovie
-    //      }
-    //  }
-    
-    //  export default connect(mapStateToProps)(MovieCard);
-    
-
-
-export default MovieCard;
+export default connect(null, mapDispatchToProps)(MovieCard);

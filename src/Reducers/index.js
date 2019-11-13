@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { tsConstructSignatureDeclaration } from '@babel/types';
+
 // reducers
 export const initialState = {
     movies: [] , 
@@ -33,10 +33,18 @@ export const initialState = {
               loading: false,
               selectedMovie: action.payload
             };
+         case "MOVIE_DELETED":
+            return {
+              ...state,
+              loading: false,
+              selectedMovie: action.payload
+          };
       default:
         return state;
     }
 };
+
+
   
 const rootReducer = combineReducers({
   reducer
