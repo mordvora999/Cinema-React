@@ -29,7 +29,7 @@ opacity: 1;
 .popup{
 margin: 70px auto;
 padding: 20px;
-background: rgb(112, 17, 17);
+background:darkseagreen;
 /* background: rgba(255,255,255,0.2); */
 border-radius: 5px;
 width: 50%;
@@ -69,3 +69,7 @@ color: #09d3ac;
     height: 80px;
     margin: auto;
   }
+
+#search{
+  width: 350px;
+}

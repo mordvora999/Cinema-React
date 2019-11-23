@@ -3,134 +3,92 @@ import './App.css';
 import SearchBar from './components/SearchBar';
 import MovieCard from './components/MovieCard';
 import axois from 'axios';
-import  { useEffect,useReducer } from 'react';
-import {reducer,initialState} from './Reducers';
+import  { useEffect } from 'react';
 import spinner from './assets/ajax-loader.gif';
+import { connect } from 'react-redux';
+import AddPopup from './components/AddPopup';
+import { useState} from 'react';
+//import PaginationExampleCompact from './components/exe'
 
 const MOVIE_API_URL = "https://www.omdbapi.com/?s=man&apikey=b3f6f90a";
 
-
-
-const App = () => {
-const [state, dispatch] = useReducer(reducer, initialState);
-
+const App = props => {
   useEffect(() => {
+    props.SEARCH_MOVIES_REQUEST();
     axois.get(MOVIE_API_URL)
     .then(jsonResponse => {console.log("search data=>",jsonResponse)
-      dispatch({
-        type: "SEARCH_MOVIES_SUCCESS",
-        payload: jsonResponse.data.Search
-      });  
+
+    props.SEARCH_MOVIES_SUCCESS(jsonResponse.data.Search)
     })
     .catch(err=>{console.log("error");})
   }, []);
 
  const onSubmit = (term) => {
-    dispatch({
-      type: "SEARCH_MOVIES_REQUEST"
-    });
+
+  props.SEARCH_MOVIES_REQUEST();
+
    axois.get(`http://www.omdbapi.com/?apikey=b3f6f90a&s=${term}`)
    .then(data => {
      console.log("data=>",data);
      if(data.data.Response === "True")
      {
-      dispatch({
-        type: "SEARCH_MOVIES_SUCCESS",
-        payload: data.data.Search
-      });
+      props.SEARCH_MOVIES_SUCCESS(data.data.Search)
      }
      else{
-      dispatch({
-        type: "SEARCH_MOVIES_FAILURE",
-        error: data.data.Error
-      });
+      props.SEARCH_MOVIES_FAILURE(data.data.Error)
      }
     })
     .catch(error => {console.log("opps! ",error.massege);})    
   }
-
-  //  const  selectMovie=(movie)=>{console.log("app =>>>>> select movie")
-  //   dispatch({
-  //     type: "MOVIE_SELECTED",
-  //     payload:movie
-  //   });
-  // }
-//onClick={selectMovie(movie)}
-  const { movies, loading } = state;
-  const ShowMovies =
-  loading === true ? (<img className="spinner" src={spinner} alt="Loading spinner" />) 
-     : (movies.map((movie, index) => 
+console.log("props.loading",props.loading)
+ const ShowMovies =
+ props.loading === true ? (<img className="spinner" src={spinner} alt="Loading spinner" />) 
+     : (props.movies.map((movie, index) => 
      {
        return(<MovieCard key={`${index}-${movie.Title}`}  movie={movie} />)
-      }
-         
-       )
+      })
   );
-console.log('reducer movies=========',movies)
+
+  const [ showAddPopup, setShowAddPopup ] = useState(false);
+  function addMovie(){
+      console.log(" add movie props",props)
+      showAddPopup ? setShowAddPopup(false) : setShowAddPopup(true);
+    }
+    const popupAdd = showAddPopup ? <AddPopup closePopup={addMovie.bind(this)} /> : null;
+   
     return(
-      <div className="container ui" style={{marginTop:'20px'}}>
+      
+      <div className="container ui" style={{marginTop:'20px'}}>        
         <SearchBar send={onSubmit} />
+        <button className="ui positive basic button" onClick={ addMovie.bind(this) } ><i className="icon plus"></i>Add Movie</button>
+        {/* <PaginationExampleCompact/> */}
+        <br></br><br></br>
         <div className="moviesList">
        {ShowMovies}
        </div>
+       <div style={{border:'2px',width:'400px'}}>{popupAdd}</div>
       </div>
+      
     )
-    
-
-  
 }
-
-// const mapStateToProps = state => {
-//   return { songs: state.songs}
-// }
-// export default connect(mapStateToProps)(MovieCard);
-
-export default App;
-
-
-// class App extends React.Component{
-
-//   state = { Movies:[] };
-
-//   onSubmit = (term) => {
-//     axois.get(`http://www.omdbapi.com/?apikey=b3f6f90a&t=${term}`)
-//     .then(data => {
-//       console.log("data=>",data);
-//       this.setState({
-//         Movies: data.data
-//       })
-//     }).catch(error => {
-//       console.log("opps! ",error.massege);
-//     })
-//   }
-
-//   render(){
-//     //const  { Movies }  = this.state;
-//     return(
-//     <div className="container ui" style={{marginTop:'20px'}}>
-//       <SearchBar send={this.onSubmit} />
-//         {
-//           <div className="moviesList">
-//             {
-//               // this.state.Movies.map(movie => <MovieCard movie={movie} />)
-//               <MovieCard movie={this.state.Movies} />
-//             }
-//           </div>
-//         }
-//         {/* {
-//           <div>
-//             { this.state.Movies.length > 0 ? 
-//               // console.log("succsses")
-//               this.state.Movies.map(movie => { return (<MovieCard movie={movie} />)}) 
-//                :
-//                ( <p>Couldn't find any movie. Please search again using
-//                another search criteria.</p> )
-//               // console.log("no-succsses")
-//             }
-//           </div>
-//         } */}
-//     </div>
-//   );
-//   }
-// }
-// export default App;
+const mapStateToProps = state =>{
+  return{
+     loading:state.reducer.loading,
+     movies:state.reducer.movies
+  }
+}
+const mapDispatch = dispatch => {
+  return {
+    SEARCH_MOVIES_SUCCESS:(movie) => dispatch({
+          type:'SEARCH_MOVIES_SUCCESS',
+          payload: movie }),
+   SEARCH_MOVIES_REQUEST: () => dispatch ({
+          type: 'SEARCH_MOVIES_REQUEST'
+      }),
+      SEARCH_MOVIES_FAILURE: (movie) => dispatch ({
+        type: 'SEARCH_MOVIES_FAILURE',
+        payload: movie
+    })
+  }
+}
+export default connect(mapStateToProps, mapDispatch)(App);

@@ -1,7 +1,7 @@
 import React from 'react';
 import Popup from './Popup';
 import DeletePopup from './DeletePopup';
-import {  useState} from 'react';
+import { useState} from 'react';
 //import { reducer, initialState } from '../Reducers';
 import { connect } from 'react-redux';
 
@@ -25,14 +25,13 @@ const MovieCard = props => {
         props.deletedMovie(props.movie);
     }
 
-    const popupEdit = showEditPopup ? <Popup /> : null;
-    const popupDelete = showDeletePopup ? <DeletePopup /> : null;
+    const popupEdit = showEditPopup ? <Popup closePopup={togglePopup.bind(this)} /> : null;
+    const popupDelete = showDeletePopup ? <DeletePopup closeDeletePopup={deleteMovie.bind(this)} /> : null;
 
     return (
         <div> 
             <div style={{float: 'left', margin: '20px'}} className="ui card">
                 <div className="content images">
-                    { console.log("Component MovieCard") } 
                      <div className="header title">{props.movie.Title}</div>
                     { <img className="cover" src={props.movie.Poster}
                         alt={`The Movie Title: ${props.movie.Title}`}/>

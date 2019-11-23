@@ -2,14 +2,14 @@ import { combineReducers } from 'redux';
 
 // reducers
 export const initialState = {
-    movies: [] , 
+     movies: [] , 
     selectedMovie: {},
     loading: true
     
   };
 
   export const reducer = (state = initialState, action) => {
-  
+  console.log("reduser--------")
     switch (action.type) {
       case "SEARCH_MOVIES_REQUEST":
         return {
@@ -17,6 +17,7 @@ export const initialState = {
           loading: true
         };
       case "SEARCH_MOVIES_SUCCESS":
+          console.log("movies action--------",action.payload)
         return {
           ...state,
           loading: false,
@@ -28,6 +29,7 @@ export const initialState = {
           loading: false
         };
         case "MOVIE_SELECTED":
+          console.log("action",action)
             return {
               ...state,
               loading: false,
@@ -36,9 +38,22 @@ export const initialState = {
          case "MOVIE_DELETED":
             return {
               ...state,
-              loading: false,
+              loading:false,
               selectedMovie: action.payload
           };
+          case "SAVE_MOVIE":
+            return {
+              ...state,
+              loading: false,
+              movies: action.payload
+          };
+          case "ADD_MOVIE":
+            return {
+              ...state,
+              loading: false,
+              movies: action.payload
+          };
+          
       default:
         return state;
     }

@@ -1,10 +1,37 @@
 import React from 'react';
-//import { useReducer } from 'react';
-//import { reducer, initialState } from '../Reducers';
 import { connect } from 'react-redux';
 
 const Popup = props => {
 
+    function cancelEdit(){
+        props.closePopup();
+    }
+
+   function saveEdit()
+   {
+    let valTitle= document.getElementById("title").value;
+    let valYear= document.getElementById("year").value;
+    for(let i = 0 ; i<props.movies.length;i++)
+    {
+         if(props.movies[i].imdbID === props.movie.imdbID )  
+         {
+           console.log("props  => ",props);
+              props.movies[i].Title = valTitle;
+             props.movies[i].Year = valYear;
+             props.movie.Title = valTitle;
+             props.movie.Year = valYear;
+             props.requestMovie();
+            props.saveMovie(props.movies);
+         } 
+        if(props.movies[i].Title===valTitle && props.movies[i].imdbID !== props.movie.imdbID)
+        {
+           alert("existing movie!!!!!!")
+            break;
+        }  
+         props.closePopup();  
+    }
+
+    }
     return(
         <div className="overlay">
         <div className="popup">
@@ -13,13 +40,14 @@ const Popup = props => {
                 <div className="field">
                     <label>Title</label>
                     <div className="field">
-                        <input type="text" defaultValue={props.movie.Title} name="movie[title]" pattern="[A-Za-z]+('[A-Za-z]+)?"/> 
+                        <input type="text" id="title" defaultValue={props.movie.Title} required name="movie[title]" //pattern="[A-Za-z]+('[A-Za-z]+)?"
+                        /> 
                     </div>
                     <label>Year</label>
                     <div className="field">
-                        <input type="text" defaultValue={props.movie.Year} name="movie[year]" />
+                        <input type="text" id="year" defaultValue={props.movie.Year} required name="movie[year]" />
                     </div>
-                    <label>Runtime</label>
+                    {/* <label>Runtime</label>
                     <div className="field">
                         <input type="text" defaultValue={props.movie.Runtime} name="movie[runtime]" />
                     </div>
@@ -43,12 +71,12 @@ const Popup = props => {
                     <label>Director</label>
                     <div className="field">
                         <input type="text" defaultValue={props.movie.Director} name="movie[director]" />
-                    </div> 
+                    </div>  */}
                 </div> 
                 <div style={{float:'right'}} className="ui buttons">
-                    <button className="ui button">Cancel</button>
+                    <input type="button" className="ui button" value="Cancel" onClick={ cancelEdit.bind(this) } />
                         <div className="or"></div>
-                    <button className="ui positive button">Save</button>
+                    <input  type="button" className="ui positive button" onClick={ saveEdit.bind(this) }  value="Save"/>
                 </div>
             </form>
             </div>
@@ -58,8 +86,19 @@ const Popup = props => {
 
 const mapStateToProps = state => {
     return {
-        movie: state.reducer.selectedMovie
+        movie: state.reducer.selectedMovie,
+        movies:state.reducer.movies
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        saveMovie: (movie) => dispatch({
+            type:'SAVE_MOVIE',
+            payload: movie }),
+         requestMovie: () => dispatch({
+            type:'SEARCH_MOVIES_REQUEST' })
     }
 }
 
-export default connect(mapStateToProps)(Popup);
+
+export default connect(mapStateToProps,mapDispatchToProps)(Popup);

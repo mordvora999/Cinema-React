@@ -1,7 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+
 const DeletePopup = props => {
+
+    function cancleDelete(){
+        props.closeDeletePopup();
+    }
+
+    function deleteMovie(){
+
+      const MoviesArr =   props.movies.filter(m => m.imdbID != props.movie.imdbID)
+        console.log("MoviesArr",MoviesArr);
+        props.movie_delete(MoviesArr);
+        props.closeDeletePopup();
+        console.log("deleteMovie propssssss  => ",props);
+    }
 
     return(
         <div className="overlay">
@@ -12,9 +26,9 @@ const DeletePopup = props => {
                 Are you sure you want to delete the movie: {props.movie.Title} ?
                 </div>
                     <div className="ui buttons" style={{float:'right'}}>
-                        <button className="ui button">Cancel</button>
+                        <input type="button" className="ui button" value="Cancel" onClick={ cancleDelete.bind(this) }  />
                             <div className="or"></div>
-                        <button className="ui positive button" >Delete</button>
+                        <input type="button" className="ui positive button" value="Delete" onClick={ deleteMovie.bind(this) } />
                     </div>
                 </form> 
             </div>
@@ -24,8 +38,18 @@ const DeletePopup = props => {
 
 const mapStateToProps = state => {
     return {
-        movie: state.reducer.selectedMovie
+        movie: state.reducer.selectedMovie,
+        movies:state.reducer.movies
     }
 }
 
-export default connect(mapStateToProps)(DeletePopup);
+const mapDispatchToProps = dispatch => {
+    return {
+        movie_delete: (moviesArr) => dispatch({
+            type:'SAVE_MOVIE',
+            payload: moviesArr })  
+
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DeletePopup);
